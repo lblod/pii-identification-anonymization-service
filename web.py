@@ -3,7 +3,7 @@ from presidio_analyzer import AnalyzerEngine
 
 analyzer = AnalyzerEngine()
 
-@app.route("/detect", methods=["POST"])
+@app.route("/test", methods=["POST"])
 def detect_pii():
     """
     Expect JSON: { "text": "<your text here>" }
