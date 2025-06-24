@@ -1,20 +1,5 @@
 from flask import request, jsonify
-from presidio import analyze
-
-
-def detect_pii(text: str):
-    results = analyze(text)
-
-    return [
-        {
-            "start": r.start,
-            "end": r.end,
-            "entity": r.entity_type,
-            "score": round(r.score, 3),
-            "match": text[r.start : r.end],
-        }
-        for r in results
-    ]
+from presidio import detect_pii
 
 
 @app.route("/raw", methods=["POST"])

@@ -16,7 +16,7 @@ nlp_engine = provider.create_engine()
 rrn_pattern = Pattern(
     name="BELGIAN_RRN_PATTERN",
     regex=r"\b\d{2}[.\-]?\d{2}[.\-]?\d{2}[.\-]?\d{3}[.\-]?\d{2}\b",
-    score=0.85
+    score=0.85,
 )
 rrn_recognizer = PatternRecognizer(
     supported_entity="BELGIAN_NATIONAL_REGISTRY",
@@ -33,10 +33,19 @@ analyzer = AnalyzerEngine(
 analyzer.registry.add_recognizer(rrn_recognizer)
 
 
-def analyze(text):
+def detect_pii(text: str):
     try:
         results = analyzer.analyze(text=text, language="nl")
     except ValueError:
         results = analyzer.analyze(text=text, language="en")
 
-    return results
+    return [
+        {
+            "start": r.start,
+            "end": r.end,
+            "entity": r.entity_type,
+            "score": round(r.score, 3),
+            "match": text[r.start : r.end],
+        }
+        for r in results
+    ]
