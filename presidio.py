@@ -33,19 +33,37 @@ analyzer = AnalyzerEngine(
 analyzer.registry.add_recognizer(rrn_recognizer)
 
 
-def detect_pii(text: str):
-    try:
-        results = analyzer.analyze(text=text, language="nl")
-    except ValueError:
-        results = analyzer.analyze(text=text, language="en")
 
-    return [
+def filter_overlaps(spans: list) -> list:
+    sorted_spans = sorted(spans, key=lambda r: r["score"], reverse=True)
+    kept = []
+    for span in sorted_spans:
+        if not any(
+            span["start"] < kept_span["end"] and kept_span["start"] < span["end"]
+            for kept_span in kept
+        ):
+            kept.append(span)
+    
+    return sorted(kept, key=lambda r: r["start"])
+
+
+
+def detect_pii(text: str, min_score: float = 0.6) -> list:
+    try:
+        raw_results = analyzer.analyze(text=text, language="nl")
+    except ValueError:
+        raw_results = analyzer.analyze(text=text, language="en")
+
+    results = [
         {
             "start": r.start,
             "end": r.end,
             "entity": r.entity_type,
             "score": round(r.score, 3),
-            "match": text[r.start : r.end],
+            "match": text[r.start:r.end],
         }
-        for r in results
+        for r in raw_results
+        if r.score >= min_score
     ]
+
+    return filter_overlaps(results)
