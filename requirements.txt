@@ -1,3 +1,2 @@
 presidio_analyzer
-flask
 presidio
