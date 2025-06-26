@@ -43,7 +43,7 @@ def filter_overlaps(spans: list) -> list:
             for kept_span in kept
         ):
             kept.append(span)
-
+    
     return sorted(kept, key=lambda r: r["start"])
 
 
