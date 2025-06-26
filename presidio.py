@@ -43,11 +43,7 @@ def filter_overlaps(spans: list) -> list:
             for kept_span in kept
         ):
             kept.append(span)
-<<<<<<< feature/detect-pii-in-bpmn
 
-=======
-    
->>>>>>> development
     return sorted(kept, key=lambda r: r["start"])
 
 
@@ -70,7 +66,6 @@ def detect_pii(text: str, min_score: float = 0.6) -> list:
         if r.score >= min_score
     ]
 
-<<<<<<< feature/detect-pii-in-bpmn
     return filter_overlaps(results)
 =======
     return filter_overlaps(results)
