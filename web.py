@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify
 import xml.etree.ElementTree as ET
 from presidio import detect_pii
 
@@ -40,19 +40,6 @@ def process_bpmn_file(file):
         "total_pii_found": len(pii_results)
     }
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        try:
-            file = request.files.get("file")
-            result = process_bpmn_file(file)
-            return jsonify(result)
-        except ValueError as e:
-            return jsonify({"error": str(e)}), 400
-        except Exception as e:
-            return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
-    
-    return render_template("index.html")
 
 @app.route("/raw", methods=["POST"])
 def detect_raw():
