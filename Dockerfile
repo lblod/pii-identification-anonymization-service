@@ -4,4 +4,3 @@ LABEL maintainer="info@redpencil.io"
 RUN python -m spacy download en_core_web_md
 RUN python -m spacy download nl_core_news_md
 
-COPY templates/ /usr/src/app/templates/
