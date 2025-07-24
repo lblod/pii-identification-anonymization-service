@@ -21,6 +21,11 @@ def anonymize_raw():
     return jsonify({"error": "Not implemented yet"}), 501
 
 
+########################################################################
+# BPMN
+########################################################################
+
+
 def process_bpmn_file(file):
     if not file or file.filename == "":
         raise ValueError("No file selected")
@@ -45,11 +50,6 @@ def process_bpmn_file(file):
         "pii_results": pii_results,
         "total_pii_found": len(pii_results),
     }
-
-
-########################################################################
-# BPMN
-########################################################################
 
 
 @app.route("/bpmn/identify", methods=["POST"])
