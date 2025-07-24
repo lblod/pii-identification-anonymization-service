@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from presidio import detect_pii
+from identification import detect_pii
 from bpmn import extract_elem_from_bpmn
 
 
