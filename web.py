@@ -3,6 +3,24 @@ from presidio import detect_pii
 from bpmn import extract_elem_from_bpmn
 
 
+########################################################################
+# RAW
+########################################################################
+
+
+@app.route("/raw/identify", methods=["POST"])
+def identify_raw():
+    data = request.get_json(force=True, silent=True) or {}
+    text = data.get("text", "")
+    output = detect_pii(text)
+    return jsonify(output)
+
+
+@app.route("/raw/anonymize", methods=["POST"])
+def anonymize_raw():
+    return jsonify({"error": "Not implemented yet"}), 501
+
+
 def process_bpmn_file(file):
     if not file or file.filename == "":
         raise ValueError("No file selected")
@@ -29,16 +47,13 @@ def process_bpmn_file(file):
     }
 
 
-@app.route("/raw", methods=["POST"])
-def detect_raw():
-    data = request.get_json(force=True, silent=True) or {}
-    text = data.get("text", "")
-    output = detect_pii(text)
-    return jsonify(output)
+########################################################################
+# BPMN
+########################################################################
 
 
-@app.route("/bpmn", methods=["POST"])
-def detect_bpmn():
+@app.route("/bpmn/identify", methods=["POST"])
+def identify_bpmn():
     try:
         file = request.files.get("file")
         output = process_bpmn_file(file)
@@ -47,3 +62,8 @@ def detect_bpmn():
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
+
+
+@app.route("/bpmn/anonymize", methods=["POST"])
+def anonymize_bpmn():
+    return jsonify({"error": "Not implemented yet"}), 501
