@@ -1,7 +1,14 @@
-from flask import request, jsonify
+from flask import request, jsonify, Response
 from identification import detect_pii
 from anonymization import mask_spans
-from bpmn import extract_elem_from_bpmn
+from bpmn import (
+    deserialize_bpmn,
+    serialize_bpmn,
+    extract_elem_from_bpmn,
+    get_element_name,
+    set_element_name,
+)
+import json
 
 
 ########################################################################
@@ -79,4 +86,26 @@ def identify_bpmn():
 
 @app.route("/bpmn/anonymize", methods=["POST"])
 def anonymize_bpmn():
-    return jsonify({"error": "Not implemented yet"}), 501
+    file = request.files.get("file")
+
+    if not file or file.filename == "":
+        return jsonify({"error": "No file selected"}), 400
+
+    bpmn = deserialize_bpmn(file)
+
+    pointers = request.form.get("pointers", "[]")
+    pointers = json.loads(pointers)
+
+    if not isinstance(pointers, list):
+        return jsonify({"error": "Invalid payload"}), 400
+
+    groups = {}
+    for p in pointers:
+        groups.setdefault(p["id"], []).append(p)
+
+    for element_id, spans in groups.items():
+        original = get_element_name(bpmn, element_id)
+        masked = mask_spans(original, spans)
+        set_element_name(bpmn, element_id, masked)
+
+    return Response(serialize_bpmn(bpmn), mimetype="application/xml"), 200
