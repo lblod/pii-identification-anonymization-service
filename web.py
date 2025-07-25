@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from identification import detect_pii
+from anonymization import mask_spans
 from bpmn import extract_elem_from_bpmn
 
 
@@ -12,13 +13,25 @@ from bpmn import extract_elem_from_bpmn
 def identify_raw():
     data = request.get_json(force=True, silent=True) or {}
     text = data.get("text", "")
+
+    if not isinstance(text, str):
+        return jsonify({"error": "Invalid payload"}), 400
+
     output = detect_pii(text)
     return jsonify(output)
 
 
 @app.route("/raw/anonymize", methods=["POST"])
 def anonymize_raw():
-    return jsonify({"error": "Not implemented yet"}), 501
+    data = request.get_json(force=True, silent=True) or {}
+    text = data.get("text", "")
+    spans = data.get("spans", [])
+
+    if not isinstance(text, str) or not isinstance(spans, list):
+        return jsonify({"error": "Invalid payload"}), 400
+
+    result = mask_spans(text, spans)
+    return jsonify({"anonymized_text": result}), 200
 
 
 ########################################################################
